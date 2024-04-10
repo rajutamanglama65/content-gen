@@ -2,9 +2,11 @@ import React from "react";
 import UploadBar from "../components/UploadBar";
 import Options from "../components/Options";
 
-interface Props {}
+interface Props {
+  setTopic: (options: any) => void;
+}
 
-const HomePage = (props: Props) => {
+const HomePage = ({ setTopic }: Props) => {
   const keywords = [
     { id: 1, keyword: "serverless function" },
     { id: 2, keyword: "public beta" },
@@ -17,7 +19,11 @@ const HomePage = (props: Props) => {
         <div className="flex align-center block-view">
           {keywords.map((item) => (
             <div key={item.id}>
-              <Options keyword={item.keyword} />
+              <Options
+                keyword={item.keyword}
+                id={item.id}
+                setTopic={setTopic}
+              />
             </div>
           ))}
         </div>
