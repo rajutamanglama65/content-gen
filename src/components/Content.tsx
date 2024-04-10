@@ -113,13 +113,13 @@ const contentData = [
   },
 ];
 const Content = ({ clickedLessonId, topic }: any) => {
-  console.log("from content: ", clickedLessonId);
-  console.log("topic content: ", topic);
+  // console.log("from content: ", clickedLessonId);
+  // console.log("topic content: ", topic);
   return (
     <>
       {contentData.map((cnt) =>
         cnt.id === topic ? (
-          <div className="wrapper flex block-view split-pair">
+          <div key={cnt.id} className="wrapper flex block-view split-pair">
             <h1>
               Title:{" "}
               {clickedLessonId === 1 || topic === 1
