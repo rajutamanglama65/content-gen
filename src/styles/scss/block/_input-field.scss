@@ -1,6 +1,8 @@
 .input-field {
   width: 100%;
-  padding: 0.5rem 0.5rem;
+  padding: 0.1rem 0.3rem;
+  border-color: $primary-color;
+  border-radius: 5px;
   color: $text-color;
 
   &:focus {

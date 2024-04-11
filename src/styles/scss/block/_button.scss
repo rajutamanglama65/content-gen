@@ -1,12 +1,12 @@
 .primary-button {
   // padding: 0 6.5rem;
-  width: 8rem;
+  width: 100%;
   background-color: $primary-color;
   color: $light-color;
   border: 1px solid $primary-color;
   // text-decoration: none;
   border-radius: 5px;
-  font-size: $h5;
+  font-size: $paragraph;
   &:hover {
     background-color: $primary-color-dark;
   }
@@ -38,7 +38,7 @@
   border: none;
   background-color: $primary-color;
   color: $light-color;
-  padding: 0.5rem 1rem;
+  // padding: 0.5rem 1rem;
   font-size: 1rem;
   border-radius: 5px;
   cursor: pointer;
@@ -47,12 +47,16 @@
   }
 }
 
-.btn-del {
-  color: $secondary_color;
+.btn-navigator {
+  color: $primary-color;
 }
 
-.btn-edit {
+.btn-logout {
   color: $primary-color;
+  border: 1px solid black;
+  border-radius: 5px;
+  background-color: rgb(36, 36, 177);
+  color: white;
 }
 
 .display-btn {

@@ -37,24 +37,24 @@ const UploadBar = (props: Props) => {
 
   return (
     <>
-      <div className="flex split-pair align-center">
-        <div style={{ width: "50%" }}>
-          <form>
+      <div className="flex block-view align-center" style={{ width: "100%" }}>
+        <div style={{ width: "100%" }}>
+          <form style={{ width: "100%" }}>
             <input
               placeholder="enter a url"
               type="text"
               className="input-field"
               // style={{ width: "50%" }}
             />
-            <button className="region-margin-tn primary-button">Fetch</button>
+            <button className="region-margin-tn primary-button">
+              Please provide a URL to generate topics
+            </button>
           </form>
         </div>
 
-        <div>
-          <button className="primary-button" onClick={openModal}>
-            Upload
-          </button>
-        </div>
+        <button className="primary-button" onClick={openModal}>
+          Upload pdf file to generate topics
+        </button>
       </div>
 
       <Modal

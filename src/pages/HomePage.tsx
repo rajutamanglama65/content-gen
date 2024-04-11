@@ -7,16 +7,21 @@ interface Props {
 }
 
 const HomePage = ({ setTopic }: Props) => {
-  const keywords = [
-    { id: 1, keyword: "serverless function" },
-    { id: 2, keyword: "public beta" },
-    { id: 3, keyword: "SSL certificate" },
-  ];
   return (
     <>
       <div className="wrapper region-md">
-        <UploadBar />
-        <div className="flex align-center block-view">
+        <div
+          className="flex block-view"
+          style={{ width: "50%", margin: "0 auto" }}
+        >
+          <h1 className="text-center">MicroLesson Generator</h1>
+          <UploadBar />
+          <div>
+            <Options />
+          </div>
+        </div>
+
+        {/* <div className="flex align-center block-view">
           {keywords.map((item) => (
             <div key={item.id}>
               <Options
@@ -26,7 +31,7 @@ const HomePage = ({ setTopic }: Props) => {
               />
             </div>
           ))}
-        </div>
+        </div> */}
       </div>
     </>
   );
