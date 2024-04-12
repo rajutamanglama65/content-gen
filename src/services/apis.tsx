@@ -8,7 +8,7 @@ export const generateTopicFromURL = async (url: any) => {
 
     return response.data;
   } catch (error: any) {
-    return error.response.data.msg;
+    return error.message;
   }
 };
 

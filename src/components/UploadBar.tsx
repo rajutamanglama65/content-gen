@@ -1,18 +1,10 @@
 import { useContext, useEffect, useState } from "react";
 import Modal from "react-modal";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import validator from "validator";
 import { generateTopicFromURL, generateTopicsFromFile } from "../services/apis";
 import { UrlTopicContext } from "../context/urlTopicContext";
-
-// https://6vg60bqm-8000.inc1.devtunnels.ms/generateTopicsFromURL   --> topic gen
-
-// response body
-// [
-//   "HubSpot CMS overview",
-//   "Introduction to API and its usage",
-//   "Basics of JavaScript and NodeJS programming"
-// ]
-
-// https://6vg60bqm-8000.inc1.devtunnels.ms/generateTopicsFromFile --> pdf topic gen
 
 type Props = {};
 
@@ -38,9 +30,10 @@ const UploadBar = (props: Props) => {
 
   const { setTopicData, setLoading, loading } = useContext(UrlTopicContext);
 
-  // useEffect(() => {
-
-  // }, [])
+  const warningNotification = (msg: string) =>
+    toast.warning(msg, { className: "toast-msg" });
+  const errNotification = (msg: string) =>
+    toast.error(msg, { className: "toast-msg" });
 
   useEffect(() => {
     Modal.setAppElement("#root"); // Set the app element
@@ -61,26 +54,39 @@ const UploadBar = (props: Props) => {
   const urlTopicGenHandler = async (e: any, url: any) => {
     e.preventDefault();
     setLoading(true);
+
+    if (!url.url || validator.isURL(url.url) === false) {
+      warningNotification("Please enter a valid URL!");
+      setLoading(false);
+      return;
+    }
     try {
       const topic = await generateTopicFromURL(url);
       console.log("topic: ", topic);
-
+      // if (topic === "Network Error") {
+      //   return errNotification("Something went wrong in server!");
+      // }
       setTopicData(topic);
 
       console.log("topic: ", topic);
     } catch (error) {
-      console.error("Error:", error);
-    } finally {
       setLoading(false);
-      urlVal.url = "";
+      setUrlVal({ url: "" });
+      errNotification("Something went wrong in server!");
+      console.log("Error:", error);
     }
+    // } finally {
+
+    // }
   };
 
   const fileTopicGenHandler = async (e: any, file: any) => {
     e.preventDefault();
+    setLoading(true);
 
     if (!file) {
-      alert("Please select a file.");
+      warningNotification("Please select a file.");
+      setLoading(false);
       return;
     }
 
@@ -88,11 +94,20 @@ const UploadBar = (props: Props) => {
     formData.append("file", file);
 
     try {
-      const response = generateTopicsFromFile(formData);
+      const response = await generateTopicsFromFile(formData);
 
+      // if (response === undefined) {
+      //   return errNotification("Something went wrong in server!");
+      // }
+      setTopicData(response);
       console.log("topicPDF: ", response);
     } catch (error) {
       console.error("Error uploading file:", error);
+      errNotification("Something went wrong on the server!");
+    } finally {
+      setLoading(false);
+      setFile(null);
+      closeModal();
     }
   };
 
@@ -122,6 +137,7 @@ const UploadBar = (props: Props) => {
         <button className="primary-button" onClick={openModal}>
           Upload pdf file to generate topics
         </button>
+        <ToastContainer />
       </div>
 
       <Modal
@@ -131,11 +147,11 @@ const UploadBar = (props: Props) => {
         style={customStyles}
         contentLabel="Example Modal"
       >
-        <form onSubmit={(e) => fileTopicGenHandler}>
-          <input type="file" multiple />
+        <form onSubmit={(e) => fileTopicGenHandler(e, file)}>
+          <input type="file" onChange={handleFileChange} multiple />
           <div className="flex split-pair align-center region-top-margin-md">
             <button className="btn" type="submit">
-              Submit
+              {loading ? "Loading..." : "Submit"}
             </button>
             <button className="btn" onClick={closeModal}>
               Close

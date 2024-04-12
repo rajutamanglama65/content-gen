@@ -26,18 +26,6 @@ const HomePage = ({ setTopic }: Props) => {
             <Options />
           </div>
         </div>
-
-        {/* <div className="flex align-center block-view">
-          {keywords.map((item) => (
-            <div key={item.id}>
-              <Options
-                keyword={item.keyword}
-                id={item.id}
-                setTopic={setTopic}
-              />
-            </div>
-          ))}
-        </div> */}
       </div>
     </>
   );

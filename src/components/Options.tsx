@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
@@ -7,8 +7,6 @@ import { ContentContext } from "../context/contentContext";
 import { generateContent } from "../services/apis";
 
 interface Props {
-  // keyword: string;
-  // id: number;
   setTopic: (id: any) => void;
 }
 
@@ -27,9 +25,11 @@ const Options = (props: any) => {
     { id: 3, keyword: "SSL certificate" },
   ];
 
-  const notify = (msg: string) => toast.error(msg, { className: "toast-msg" });
+  const warningNotification = (msg: string) =>
+    toast.warning(msg, { className: "toast-msg" });
 
-  // const [loading, setLoading] = useState(true);
+  const errNotification = (msg: string) =>
+    toast.error(msg, { className: "toast-msg" });
 
   const navigate = useNavigate();
 
@@ -42,23 +42,21 @@ const Options = (props: any) => {
     navigate("/content");
   };
 
-  // useEffect(() => {
-  //   if (contentData !== null || contentData !== undefined) {
-  //     navigateHandler();
-  //   }
-  // }, [contentData]);
-
   const submitHandler = async (e: any, topic: any) => {
     e.preventDefault();
-    // console.log("selected opt: ", selectedOption);
-    console.log("topic-option: ", topicVal);
+
     setLoading(true);
+
+    if (!topic.topic) {
+      warningNotification("Please select a topic!");
+      setLoading(false);
+      return;
+    }
     try {
       const content = await generateContent(topic);
 
-      console.log("cntnt: ", typeof content);
       if (content === undefined) {
-        return notify("Something went wrong in server!");
+        return errNotification("Something went wrong in server!");
       }
 
       setContentData(content);
@@ -66,17 +64,18 @@ const Options = (props: any) => {
       console.log("contentData12: ", contentData);
     } catch (error) {
       console.error("Error:", error);
-      notify("Something went wrong in server!");
+      errNotification("Something went wrong in server!");
     } finally {
       setLoading(false);
       topicVal.topic = "";
-      // console.log("contData from opt else: ", contentData);
     }
   };
 
+  console.log("topicData: ", topicData);
+
   return (
     <>
-      {topicData === null ? (
+      {topicData === null || topicData === "Network Error" ? (
         <>
           <div className="region-md">
             <form onSubmit={(e) => submitHandler(e, topicVal)}>
@@ -92,29 +91,30 @@ const Options = (props: any) => {
                 </div>
               ))}
               <button type="submit" className="btn region-top-margin-tn">
-                {loading === true ? "Loading..." : "Generate"}
+                {loading ? "Loading..." : "Generate"}
               </button>
             </form>
-            <ToastContainer />;
+            <ToastContainer />
           </div>
         </>
       ) : (
         <>
           <div className="region-md">
             <form onSubmit={(e) => submitHandler(e, topicVal)}>
-              {topicData?.map((item: any, index: any) => (
-                <div key={index} className="flex gap-1">
-                  <input
-                    type="radio"
-                    value={item}
-                    checked={selectedOption === item}
-                    onChange={handleOptionChange}
-                  />
-                  <label>Teach me about {item.toLowerCase()}</label>
-                </div>
-              ))}
+              {topicData &&
+                topicData?.map((item: any, index: any) => (
+                  <div key={index} className="flex gap-1">
+                    <input
+                      type="radio"
+                      value={item}
+                      checked={selectedOption === item}
+                      onChange={handleOptionChange}
+                    />
+                    <label>Teach me about {item.toLowerCase()}</label>
+                  </div>
+                ))}
               <button type="submit" className="btn region-top-margin-tn">
-                Generate
+                {loading ? "Loading..." : "Generate"}
               </button>
             </form>
           </div>
