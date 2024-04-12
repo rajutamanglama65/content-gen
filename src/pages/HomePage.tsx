@@ -1,12 +1,18 @@
 import React from "react";
+
+import "react-toastify/dist/ReactToastify.css";
 import UploadBar from "../components/UploadBar";
 import Options from "../components/Options";
+// import { ContentContext } from "../context/contentContext";
 
 interface Props {
   setTopic: (options: any) => void;
 }
 
 const HomePage = ({ setTopic }: Props) => {
+  // const { contentData } = useContext(ContentContext);
+  // console.log("cntData: ", contentData);
+
   return (
     <>
       <div className="wrapper region-md">
