@@ -21,7 +21,7 @@ export const generateTopicsFromFile = async (file: any) => {
 
     return response.data;
   } catch (error: any) {
-    return error.response.data.msg;
+    return error.message;
   }
 };
 

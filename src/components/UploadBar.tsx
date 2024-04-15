@@ -30,11 +30,6 @@ const UploadBar = (props: Props) => {
 
   const { setTopicData, setLoading, loading } = useContext(UrlTopicContext);
 
-  const warningNotification = (msg: string) =>
-    toast.warning(msg, { className: "toast-msg" });
-  const errNotification = (msg: string) =>
-    toast.error(msg, { className: "toast-msg" });
-
   useEffect(() => {
     Modal.setAppElement("#root"); // Set the app element
   }, []);
@@ -51,6 +46,12 @@ const UploadBar = (props: Props) => {
     setFile(e.target.files[0]);
   };
 
+  const warningNotification = (msg: string) =>
+    toast.warning(msg, { className: "toast-msg" });
+
+  const errNotification = (msg: string) =>
+    toast.error(msg, { className: "toast-msg" });
+
   const urlTopicGenHandler = async (e: any, url: any) => {
     e.preventDefault();
     setLoading(true);
@@ -62,22 +63,20 @@ const UploadBar = (props: Props) => {
     }
     try {
       const topic = await generateTopicFromURL(url);
-      console.log("topic: ", topic);
+      // console.log("topic: ", topic);
       // if (topic === "Network Error") {
-      //   return errNotification("Something went wrong in server!");
+      //   return errNotification(`${topic}!`);
       // }
       setTopicData(topic);
 
       console.log("topic: ", topic);
     } catch (error) {
+      console.log("Error:", error);
+      // errNotification("Something went wrong in server!");
+    } finally {
       setLoading(false);
       setUrlVal({ url: "" });
-      errNotification("Something went wrong in server!");
-      console.log("Error:", error);
     }
-    // } finally {
-
-    // }
   };
 
   const fileTopicGenHandler = async (e: any, file: any) => {
@@ -94,16 +93,18 @@ const UploadBar = (props: Props) => {
     formData.append("file", file);
 
     try {
+      console.log("hei..");
       const response = await generateTopicsFromFile(formData);
+      // console.log("i am here..", response);
 
-      // if (response === undefined) {
-      //   return errNotification("Something went wrong in server!");
+      // if (response === "Network Error") {
+      //   return errNotification(`${response}!`);
       // }
-      setTopicData(response);
       console.log("topicPDF: ", response);
+      setTopicData(response);
     } catch (error) {
       console.error("Error uploading file:", error);
-      errNotification("Something went wrong on the server!");
+      // errNotification("Something went wrong on the server!");
     } finally {
       setLoading(false);
       setFile(null);

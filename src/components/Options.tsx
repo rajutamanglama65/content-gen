@@ -54,6 +54,7 @@ const Options = (props: any) => {
     }
     try {
       const content = await generateContent(topic);
+      // console.log("contentData12: ", contentData);
 
       if (content === undefined) {
         return errNotification("Something went wrong in server!");
@@ -61,7 +62,6 @@ const Options = (props: any) => {
 
       setContentData(content);
       navigateHandler();
-      console.log("contentData12: ", contentData);
     } catch (error) {
       console.error("Error:", error);
       errNotification("Something went wrong in server!");
