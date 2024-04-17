@@ -75,29 +75,28 @@ const Options = (props: any) => {
 
   return (
     <>
-      {topicData === null || topicData === "Network Error" ? (
-        <>
-          <div className="region-md">
-            <form onSubmit={(e) => submitHandler(e, topicVal)}>
-              {keywords?.map((item: any) => (
-                <div key={item.id} className="flex gap-1">
-                  <input
-                    type="radio"
-                    value={item.keyword}
-                    checked={selectedOption === item.keyword}
-                    onChange={handleOptionChange}
-                  />
-                  <label>Teach me about {item.keyword.toLowerCase()}</label>
-                </div>
-              ))}
-              <button type="submit" className="btn region-top-margin-tn">
-                {loading ? "Loading..." : "Generate"}
-              </button>
-            </form>
-            <ToastContainer />
-          </div>
-        </>
-      ) : (
+      {topicData === null || topicData === "Network Error" ? // <>
+      //   <div className="region-md">
+      //     <form onSubmit={(e) => submitHandler(e, topicVal)}>
+      //       {keywords?.map((item: any) => (
+      //         <div key={item.id} className="flex gap-1">
+      //           <input
+      //             type="radio"
+      //             value={item.keyword}
+      //             checked={selectedOption === item.keyword}
+      //             onChange={handleOptionChange}
+      //           />
+      //           <label>Teach me about {item.keyword.toLowerCase()}</label>
+      //         </div>
+      //       ))}
+      //       <button type="submit" className="btn region-top-margin-tn">
+      //         {loading ? "Loading..." : "Generate"}
+      //       </button>
+      //     </form>
+      //     <ToastContainer />
+      //   </div>
+      // </>
+      null : (
         <>
           <div className="region-md">
             <form onSubmit={(e) => submitHandler(e, topicVal)}>

@@ -5,6 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 import validator from "validator";
 import { generateTopicFromURL, generateTopicsFromFile } from "../services/apis";
 import { UrlTopicContext } from "../context/urlTopicContext";
+import { idb, insertDataInIndexedDb } from "../cache/idb";
 
 type Props = {};
 
@@ -26,12 +27,16 @@ const UploadBar = (props: Props) => {
     url: "",
   });
   const [file, setFile] = useState(null);
-  // const [loader, setLoader] = useState(false)
+  const [IdbData, setIdbData] = useState<any>([]);
+  const [urlExist, setUrlExist] = useState<boolean>(false);
 
-  const { setTopicData, setLoading, loading } = useContext(UrlTopicContext);
+  const { setTopicData, setLoading, loading, topicData } =
+    useContext(UrlTopicContext);
 
   useEffect(() => {
     Modal.setAppElement("#root"); // Set the app element
+    insertDataInIndexedDb();
+    getDataFromIdb();
   }, []);
 
   function openModal() {
@@ -49,8 +54,58 @@ const UploadBar = (props: Props) => {
   const warningNotification = (msg: string) =>
     toast.warning(msg, { className: "toast-msg" });
 
+  const successNotification = (msg: string) =>
+    toast.success(msg, { className: "toast-msg" });
+
   const errNotification = (msg: string) =>
     toast.error(msg, { className: "toast-msg" });
+
+  const getDataFromIdb = () => {
+    const dbPromise = idb.open("cache-idx-db", 1);
+    dbPromise.onsuccess = () => {
+      const db = dbPromise.result;
+
+      const tx = db.transaction("responseData", "readonly");
+      const dataObjStore = tx.objectStore("responseData");
+      const data = dataObjStore.getAll();
+
+      data.onsuccess = (query: any) => {
+        setIdbData(query.srcElement.result);
+      };
+
+      tx.oncomplete = function () {
+        db.close();
+      };
+    };
+  };
+
+  const checkUrlInIdb = (url: any) => {
+    console.log("url: ", url);
+    const dbPromise = idb.open("cache-idx-db", 1);
+    dbPromise.onsuccess = () => {
+      const db = dbPromise.result;
+
+      const tx = db.transaction("responseData", "readonly");
+      const urlData = tx.objectStore("responseData");
+      const urls = urlData.get(url);
+
+      urls.onsuccess = (event: any) => {
+        if (event.target.result) {
+          // Key exists
+          console.log("Key exists:", event.target.result);
+          setUrlExist(true);
+        } else {
+          // Key does not exist
+          console.log("Key does not exist");
+          setUrlExist(false);
+        }
+      };
+
+      tx.oncomplete = function () {
+        db.close();
+      };
+    };
+  };
 
   const urlTopicGenHandler = async (e: any, url: any) => {
     e.preventDefault();
@@ -61,21 +116,69 @@ const UploadBar = (props: Props) => {
       setLoading(false);
       return;
     }
-    try {
-      const topic = await generateTopicFromURL(url);
-      // console.log("topic: ", topic);
-      // if (topic === "Network Error") {
-      //   return errNotification(`${topic}!`);
-      // }
-      setTopicData(topic);
 
-      console.log("topic: ", topic);
-    } catch (error) {
-      console.log("Error:", error);
-      // errNotification("Something went wrong in server!");
-    } finally {
-      setLoading(false);
-      setUrlVal({ url: "" });
+    checkUrlInIdb(url.url);
+
+    if (!urlExist) {
+      try {
+        const topic = await generateTopicFromURL(url);
+        // console.log("topic: ", topic);
+        // if (topic === "Network Error") {
+        //   return errNotification(`${topic}!`);
+        // }
+
+        setTopicData(topic);
+
+        console.log("topic: ", topic);
+      } catch (error) {
+        console.log("Error:", error);
+        // errNotification("Something went wrong in server!");
+      } finally {
+        setLoading(false);
+        setUrlVal({ url: "" });
+      }
+
+      if (topicData) {
+        const dbPromise = idb.open("cache-idx-db", 1);
+        dbPromise.onsuccess = () => {
+          const db = dbPromise.result;
+
+          const tx = db.transaction("responseData", "readwrite");
+
+          const resData = tx.objectStore("responseData");
+
+          const data = resData.add({
+            id: url.url,
+            content: topicData,
+          });
+
+          data.onsuccess = () => {
+            tx.oncomplete = () => {
+              db.close();
+              successNotification("data cached");
+            };
+          };
+        };
+      } else {
+        return;
+      }
+    } else {
+      const dbPromise = idb.open("cache-idx-db", 1);
+      dbPromise.onsuccess = () => {
+        const db = dbPromise.result;
+
+        const tx = db.transaction("responseData", "readonly");
+        const dataObjStore = tx.objectStore("responseData");
+        const data = dataObjStore.get(url.url);
+
+        data.onsuccess = (query: any) => {
+          setTopicData(query.srcElement.result);
+        };
+
+        tx.oncomplete = function () {
+          db.close();
+        };
+      };
     }
   };
 
@@ -93,9 +196,7 @@ const UploadBar = (props: Props) => {
     formData.append("file", file);
 
     try {
-      console.log("hei..");
       const response = await generateTopicsFromFile(formData);
-      // console.log("i am here..", response);
 
       // if (response === "Network Error") {
       //   return errNotification(`${response}!`);
